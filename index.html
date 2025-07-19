@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Multi-Store Search</title>
+
+<!-- Link to manifest -->
+<link rel="manifest" href="manifest.json" />
+
+<style>
+  body { font-family: sans-serif; text-align: center; margin: 2em; }
+  input { padding: 0.5em; width: 60%; max-width: 400px; font-size: 1em; }
+  button { padding: 0.5em 1em; font-size: 1em; margin-left: 0.5em; }
+  .results { margin-top: 1em; }
+  .results a { display: block; margin: 0.5em 0; text-decoration: none; color: #0073e6; }
+</style>
+</head>
+<body>
+<h1>🔍 Multi-Store Search</h1>
+<p>Search Lowe’s, Home Depot, Ace & Walmart at once.</p>
+
+<input id="query" type="text" placeholder="Enter your item (e.g., 3/4 PVC elbow)" />
+<button onclick="search()">Search</button>
+
+<div class="results" id="results"></div>
+
+<script>
+function search() {
+  const q = encodeURIComponent(document.getElementById('query').value.trim());
+  const results = document.getElementById('results');
+  results.innerHTML = '';
+  if (!q) return;
+
+  const stores = [
+    { name: "Lowe's", url: `https://www.lowes.com/search?searchTerm=${q}` },
+    { name: "Home Depot", url: `https://www.homedepot.com/s/${q}` },
+    { name: "Ace Hardware", url: `https://www.acehardware.com/search?query=${q}` },
+    { name: "Walmart", url: `https://www.walmart.com/search?q=${q}` },
+  ];
+
+  stores.forEach(store => {
+    const a = document.createElement('a');
+    a.href = store.url;
+    a.target = '_blank';
+    a.textContent = `Search ${store.name}`;
+    results.appendChild(a);
+  });
+}
+
+// Register Service Worker for offline support
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      console.log('Service Worker registered.', reg);
+    }).catch(err => {
+      console.error('Service Worker registration failed:', err);
+    });
+  });
+}
+</script>
+</body>
+</html>
